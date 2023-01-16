@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    hostname: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+      -
+  app:
+    build:
+      context: .
+    hostname: test_cases
+    container_name: test_cases
+    image: test_cases
+    ports:
+      - 5789:5789
+    command: bash -c "ls -a && uvicorn app.main:app --host 0.0.0.0 --port 5789"
+    env_file:
+      - .env
