@@ -6,4 +6,4 @@ EXPOSE 5789
 WORKDIR /app
 COPY . /app
 
-RUN pip install -e .
+RUN pip install --upgrade pip

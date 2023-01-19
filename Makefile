@@ -3,8 +3,7 @@ run:
 
 run_docker:
 	docker-compose down
-	docker-compose -f docker-compose.yml up
+	docker-compose -f docker-compose.yml up -d
 
 install_dev:
 	pip install -e .
-

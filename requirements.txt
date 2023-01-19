@@ -1,6 +1,7 @@
 fastapi==0.89.0
 uvicorn==0.20.0
-SQLAlchemy==2.0.0rc2
-pytest
+SQLAlchemy==1.4.46
+pytest==7.2.1
 requests==2.28.1
-httpx
+httpx==0.23.3
+psycopg2==2.9.5
