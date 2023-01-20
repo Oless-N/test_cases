@@ -1,5 +1,5 @@
 import csv
-import uuid
+import logging
 from datetime import datetime, date as datetime_date
 from typing import Optional
 
@@ -152,7 +152,6 @@ class Error_logs(Base):
 
 def populate_data(table, data):
     database = connect_db()
-
     bulk = []
     for row in data:
         bulk.append(
@@ -167,10 +166,6 @@ def populate_data(table, data):
             volume=row['volume'],
             ),
         )
-        if len(bulk) >= 100:
-            database.bulk_save_objects(bulk)
-            database.commit()
-            bulk = []
 
     database.bulk_save_objects(bulk)
     database.commit()
@@ -195,6 +190,8 @@ def read_csv_data(table_obj, file_fp):
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         data = []
         loggs_errors = []
+        count_missing_docs = 0
+        count_docs = 0
 
         for rows in csv_reader:
             try:
@@ -205,20 +202,26 @@ def read_csv_data(table_obj, file_fp):
                         'launch_timestamp': datetime.utcnow(),
                         'date': rows.get('date', None),
                         'symbol': rows.get('symbol', None),
-                        'message': str(e),
+                        'message': f'{e}: {rows}',
                     }
                 )
-            if len(loggs_errors) >= 100:
+            if len(loggs_errors) >= 10:
+                count_missing_docs += len(loggs_errors)
                 write_errors(loggs_errors)
                 loggs_errors = []
             if len(data) >= 100:
                 populate_data(table_obj, data)
+                count_docs += len(data)
                 data = []
+            logging.info(f'Inserted {count_missing_docs} errors docs')
+            logging.info(f'Inserted {count_docs} docs')
 
         write_errors(loggs_errors)
         populate_data(table_obj, data)
-
-        return data
+        count_missing_docs += len(loggs_errors)
+        count_docs += len(data)
+        logging.info(f'Inserted {count_missing_docs} errors docs')
+        logging.info(f'Inserted {count_docs} docs')
 
 
 def main():
